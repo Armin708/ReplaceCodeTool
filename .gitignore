@@ -1,0 +1,31 @@
+# AL Packages
+*.app
+
+# AL cache files
+*.al.cache
+
+# VS Code settings
+.vscode/
+.vscode-test/
+
+# AL Language extension artifacts
+*.alpackages/
+.alpackages/
+
+# Backup files
+*.bak
+*.tmp
+*~
+*.orig
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Secrets or custom config files (optional)
+.env
+*.code-workspace

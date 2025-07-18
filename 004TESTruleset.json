@@ -1,0 +1,97 @@
+{
+    "name": "004 official ruleset",
+    "description": "004 official ruleset for all used code analysis tools",
+    "rules": [
+      {
+        "id": "AA0218",
+        "action": "None",
+        "justification": "You must write a tooltip in the Tooltip property for all controls of type Action and Field that exist on page objects. -> Too many places at the start."
+      },
+      {
+        "id": "AA0248",
+        "action": "None",
+        "justification": "Add 'this' qualification to improve readability. -> Too many places at the start."
+      },
+      {
+        "id": "AA0470",
+        "action": "None",
+        "justification": "Placeholders should have a comment explaining their content. -> Too many places at the start."
+      },
+      {
+        "id": "LC0002",
+        "action": "None",
+        "justification": "Any Commit(); needs a code comment -> Too many places at the start."
+      },
+      {
+        "id": "LC0010",
+        "action": "None",
+        "justification": "Show warning about code metrics for each function or trigger -> None 004 Rule."
+      },
+      {
+        "id": "LC0035",
+        "action": "None",
+        "justification": "Explicitly set AllowInCustomizations for fields omitted on pages. -> Too many places at the start."
+      },
+      {
+        "id": "LC0061",
+        "action": "Hidden",
+        "justification": "Pages of type API must have the ODataKeyFields property set to the SystemId field. -> None 004 Rule."
+      },
+      {
+        "id": "LC0068",
+        "action": "None",
+        "justification": "Informs the user that there are missing permission to access tabledata. -> Too many places at the start."
+      },
+      {
+        "id": "LC0069",
+        "action": "None",
+        "justification": "Empty statements should be avoided or should have a leading or trailing comment explaining their use. -> Too many places at the start."
+      },
+      {
+        "id": "LC0084",
+        "action": "Hidden",
+        "justification": "Use return value for better error handling. -> Too many places at the start."
+      },
+      {
+        "id": "LC0088",
+        "action": "Hidden",
+        "justification": "Option types should be avoided, use enum if applicable. -> Too many places at the start."
+      },
+      {
+        "id": "LC0090",
+        "action": "Hidden",
+        "justification": "Show Cognitive Complexity diagnostics for methods above threshold -> None 004 Rule."
+      },
+      {
+        "id": "LC0001",
+        "action": "None",
+        "justification": "FlowFields should be set to Editable = false -> Too many places at the start. PIPE Story für davor"
+      },
+      {
+        "id": "LC0023",
+        "action": "None",
+        "justification": "Always provide fieldsgroups DropDown and Brick on tables. -> Too many places at the start. PIPE Story für davor"
+      },
+      {
+        "id": "LC0013",
+        "action": "None",
+        "justification": "NotBlank on single field PKs -> Too many places at the start. PIPE Story für davor"
+      },
+      {
+        "id": "AL0667",
+        "action": "None",
+        "justification": "'FindSet' is being deprecated in the versions: '11.0' or greater. This method has been deprecated because the parameter 'UpdateKey' is not used by the runtime. Use the overload without the 'UpdateKey' parameter instead. -> Too many places at the start. PIPE Story für davor"
+      },
+      {
+        "id": "AA0074",
+        "action": "None",
+        "justification": "TextConst and Label variable names should have a suffix (an approved three-letter suffix: Msg, Tok, Err, Qst, Lbl, Txt) describing usage. -> Too many places at the start. PIPE Story für davor"
+      },
+      {
+        "id": "AA0073",
+        "action": "None",
+        "justification": "The name of temporary variable must be prefixed with Temp. -> Too many places at the start. PIPE Story für davor"
+      }
+    ],
+    "mandatoryPrefix": "04"
+}
