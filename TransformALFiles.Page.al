@@ -1,4 +1,4 @@
-page 50255 "Replace Code"
+page 50255 "Transform AL Files"
 {
     ApplicationArea = All;
     Caption = 'Replace code';
@@ -25,7 +25,7 @@ page 50255 "Replace Code"
 
                 trigger OnAction()
                 var
-                    ReplacCode: Codeunit "Replace Code";
+                    ReplacCode: Codeunit "Transform AL Files";
                 begin
                     ReplacCode.Run();
                 end;
