@@ -1,7 +1,7 @@
 page 50255 "Transform AL Files"
 {
     ApplicationArea = All;
-    Caption = 'Replace code';
+    Caption = 'Transform AL Files';
     PageType = List;
     UsageCategory = Administration;
 

@@ -5,7 +5,6 @@ codeunit 50250 "Transform AL Files"
     trigger OnRun()
     var
         FilesTemp: Record "Name/Value Buffer" temporary;
-        FileMgmt: Codeunit "File Management";
         ProgressDialog: Dialog;
         FilesProcessed: Integer;
         FilesToProcess: Integer;
@@ -46,17 +45,28 @@ codeunit 50250 "Transform AL Files"
     // Global Varables
     var
 
+        FileMgmt: Codeunit "File Management";
         RegexPatterns: Dictionary of [Text, Text];
         ReplacePatterns: Dictionary of [Text, Text];
         Error001: Label 'No files Found!';
         ExportFolder: Text;
         FolderToProcess: Text;
+        simpleUserID: Text;
 
     local procedure InitiliseDefaultValues()
     begin
 
-        FolderToProcess := '\\navprocess\DATASHARES\Testsystem\asabic\To Navision\Old';
-        ExportFolder := '\\navprocess\DATASHARES\Testsystem\asabic\To Navision\New\';
+        simpleUserID := LowerCase(UserId);
+        simpleUserID := simpleUserID.Replace('004GROUP\', '');
+
+        FolderToProcess := '\\navprocess\DATASHARES\Testsystem\' + simpleUserID + '\To Navision\Old';
+        ExportFolder := '\\navprocess\DATASHARES\Testsystem\' + simpleUserID + '\To Navision\New\';
+
+        if not FileMgmt.ServerDirectoryExists(ExportFolder) then
+            FileMgmt.ServerCreateDirectory(ExportFolder);
+
+        if FileMgmt.IsServerDirectoryEmpty(FolderToProcess) then
+            Error(Error001);
 
         // Add all the rules needed
 
