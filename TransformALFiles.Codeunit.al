@@ -56,8 +56,8 @@ codeunit 50250 "Transform AL Files"
     local procedure InitiliseDefaultValues()
     begin
 
-        simpleUserID := LowerCase(UserId);
-        simpleUserID := simpleUserID.Replace('004GROUP\', '');
+        simpleUserID := LowerCase(UserId());
+        simpleUserID := simpleUserID.Replace('004group\', '');
 
         FolderToProcess := '\\navprocess\DATASHARES\Testsystem\' + simpleUserID + '\To Navision\Old';
         ExportFolder := '\\navprocess\DATASHARES\Testsystem\' + simpleUserID + '\To Navision\New\';
@@ -87,6 +87,9 @@ codeunit 50250 "Transform AL Files"
 
         // "Query 5" zu "query 5"
         RegexPatterns.Add('\bQuery (\d+)\b', 'query $1');
+
+        // "Query 5" zu "query 5"
+        RegexPatterns.Add('pageextension (\d+) pageextension\d+ extends ("[^"]+")', 'pageextension $1 $2 extends $2');
 
 
         // 'LookupPageID = ' to 'LookupPageId = '
@@ -432,7 +435,7 @@ codeunit 50250 "Transform AL Files"
     begin
 
         // Define filepath for new file
-        ALFileOutputPath := ExportFolder + ALFilname + '.txt';
+        ALFileOutputPath := ExportFolder + ALFilname + '.' + FileMgmt.GetExtension(ALFilePath);
 
         // Create new file
         ALFileOutput.WriteMode(true);
@@ -484,6 +487,7 @@ codeunit 50250 "Transform AL Files"
             ALFileContentOld := RegexFunctions.Replace(ALFileContentOld, DictKey, RegexPatterns.Get(DictKey), 999);
 
         ALFileContentNew := ALFileContentOld;
+
 
     end;
 }

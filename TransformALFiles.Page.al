@@ -22,6 +22,10 @@ page 50255 "Transform AL Files"
                 ApplicationArea = All;
                 Caption = 'Replace Code';
                 Image = Start;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
 
                 trigger OnAction()
                 var
