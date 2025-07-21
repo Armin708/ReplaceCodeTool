@@ -71,7 +71,7 @@ codeunit 50250 "Transform AL Files"
         // Add all the rules needed
 
         // "Table 5" zu "table 5"
-        RegexPatterns.Add('LookupPageID = ', 'table $1');
+        RegexPatterns.Add('\bTable (\d+)\b = ', 'table $1');
 
         // "TableExtension 5" zu "tableextension 5"
         RegexPatterns.Add('\bTableExtension (\d+)\b', 'tableextension $1');
