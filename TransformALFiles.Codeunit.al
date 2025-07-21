@@ -55,6 +55,7 @@ codeunit 50250 "Transform AL Files"
 
     procedure ProcessSpecialRules(var ALFileContentNew: Text)
     begin
+        // pageextension 50081 pageextension50081 extends "Bank Account List" zu pageextension 50081 "Bank Account List" extends "Bank Account List"
         ProcessSpecialRulePageExtension(ALFileContentNew);
     end;
 
@@ -460,7 +461,7 @@ codeunit 50250 "Transform AL Files"
             // TODO optimization: skip empty lines
             ProcessRegexRules(ALFileContentOld, ALFileContentNew);
             ProcessOtherRules(ALFileContentNew);
-            // ProcessSpecialRules(ALFileContentNew);
+            ProcessSpecialRules(ALFileContentNew);
 
             ALTextBuilder.AppendLine(ALFileContentNew);
 
@@ -506,8 +507,8 @@ codeunit 50250 "Transform AL Files"
         ValueToReplace: Text;
 
     begin
-
         // pageextension 50081 pageextension50081 extends "Bank Account List" zu pageextension 50081 "Bank Account List" extends "Bank Account List"
+
         // test if we have a match
         if not RegexFunctions.IsMatch(ALFileContentNew, 'pageextension (\d+) pageextension\d+ extends ("[^"]+")') then
             exit;
