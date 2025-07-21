@@ -38,12 +38,13 @@ page 50255 "Transform AL Files"
             action(SpecialRulesTester)
             {
                 ApplicationArea = All;
-                Caption = 'Special Rules testers';
+                Caption = 'Special Rules tester';
                 Image = Start;
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 PromotedOnly = true;
+                Visible = false;
 
                 trigger OnAction()
                 var
