@@ -68,12 +68,12 @@ codeunit 50250 "Transform AL Files"
         RegexPattern: Text;
 
     begin
-        // Example: DP-RoutingDataSTRA_DB.XMLPort.al
-        // Corect version is DPRoutingDataSTRADB.XMLPort.al
+        // Example: DP-RoutingDataSTRA_DB.XMLPort
+        // Corect version is DPRoutingDataSTRADB.XMLPort
 
         // Copy everything until the Object.Al part
         // Example: NewFileNameOnly = DP-RoutingDataSTRA_DB
-        // Example NewfileNameObjectOnly = .XMLPort.al
+        // Example NewfileNameObjectOnly = .XMLPort
         NewFileNameOnly := CopyStr(CurrentFilename, 1, StrPos(CurrentFilename, '.' + FileMgmt.GetExtension(CurrentFilename)));
         NewfileNameObjectOnly := '.' + FileMgmt.GetExtension(CurrentFilename);
 
@@ -82,12 +82,12 @@ codeunit 50250 "Transform AL Files"
         NewFileNameOnly := RegexFunctions.Replace(NewFileNameOnly, '[^a-zA-Z0-9]', '');
 
         // Replace the objectname to the correct one
-        // Example: NewfileNameObjectOnly = .XmlPort.al
+        // Example: NewfileNameObjectOnly = .XmlPort
         foreach RegexPattern in RegexPatternsObjectName.Keys() do
             NewfileNameObjectOnly := RegexFunctions.Replace(NewfileNameObjectOnly, RegexPattern, RegexPatternsObjectName.Get(RegexPattern));
 
         // Create the new filename
-        // Example: ALOutputFilename = DPRoutingDataSTRADB.XmlPort.al
+        // Example: ALOutputFilename = DPRoutingDataSTRADB.XmlPort
         ALOutputFilename := NewFileNameOnly + NewfileNameObjectOnly;
 
     end;
