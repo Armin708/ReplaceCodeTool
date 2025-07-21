@@ -47,6 +47,7 @@ codeunit 50250 "Transform AL Files"
 
         FileMgmt: Codeunit "File Management";
         RegexPatterns: Dictionary of [Text, Text];
+        RegexPatternsObjectName: Dictionary of [Text, Text];
         ReplacePatterns: Dictionary of [Text, Text];
         Error001: Label 'No files Found!';
         ExportFolder: Text;
@@ -57,6 +58,38 @@ codeunit 50250 "Transform AL Files"
     begin
         // pageextension 50081 pageextension50081 extends "Bank Account List" zu pageextension 50081 "Bank Account List" extends "Bank Account List"
         ProcessSpecialRulePageExtension(ALFileContentNew);
+    end;
+
+    local procedure GenerateOutputFileNameBasedOnCurrentFilename(CurrentFilename: Text; var ALOutputFilename: Text)
+    var
+        RegexFunctions: Codeunit Regex;
+        NewfileNameObjectOnly: Text;
+        NewFileNameOnly: Text;
+        RegexPattern: Text;
+
+    begin
+        // Example: DP-RoutingDataSTRA_DB.XMLPort.al
+        // Corect version is DPRoutingDataSTRADB.XMLPort.al
+
+        // Copy everything until the Object.Al part
+        // Example: NewFileNameOnly = DP-RoutingDataSTRA_DB
+        // Example NewfileNameObjectOnly = .XMLPort.al
+        NewFileNameOnly := CopyStr(CurrentFilename, 1, StrPos(CurrentFilename, '.' + FileMgmt.GetExtension(CurrentFilename)));
+        NewfileNameObjectOnly := '.' + FileMgmt.GetExtension(CurrentFilename);
+
+        // Replace everything except alphanumeric Values
+        // Example: NewFileNameOnly = DPRoutingDataSTRADB
+        NewFileNameOnly := RegexFunctions.Replace(NewFileNameOnly, '[^a-zA-Z0-9]', '');
+
+        // Replace the objectname to the correct one
+        // Example: NewfileNameObjectOnly = .XmlPort.al
+        foreach RegexPattern in RegexPatternsObjectName.Keys() do
+            NewfileNameObjectOnly := RegexFunctions.Replace(NewfileNameObjectOnly, RegexPattern, RegexPatternsObjectName.Get(RegexPattern));
+
+        // Create the new filename
+        // Example: ALOutputFilename = DPRoutingDataSTRADB.XmlPort.al
+        ALOutputFilename := NewFileNameOnly + NewfileNameObjectOnly;
+
     end;
 
     local procedure InitiliseDefaultValues()
@@ -99,6 +132,16 @@ codeunit 50250 "Transform AL Files"
 
         // "Query 5" zu "query 5"
         RegexPatterns.Add('\bQuery (\d+)\b', 'query $1');
+
+        // Patterns to replace the Objectname in the AL filename correctly
+        RegexPatternsObjectName.Add('(?i)\btable\b', 'Table');
+        RegexPatternsObjectName.Add('(?i)\btableextension\b', 'TableExtension');
+        RegexPatternsObjectName.Add('(?i)\bpage\b', 'Page');
+        RegexPatternsObjectName.Add('(?i)\bpageextension\b', 'PageExtension');
+        RegexPatternsObjectName.Add('(?i)\bcodeunit\b', 'Codeunit');
+        RegexPatternsObjectName.Add('(?i)\bxmlport\b', 'Xmlport');
+        RegexPatternsObjectName.Add('(?i)\bquery\b', 'Query');
+        RegexPatternsObjectName.Add('(?i)\breport\b', 'Report');
 
         // 'LookupPageID = ' to 'LookupPageId = '
         ReplacePatterns.Add('LookupPageID = ', 'LookupPageId = ');
@@ -429,7 +472,7 @@ codeunit 50250 "Transform AL Files"
 
     end;
 
-    local procedure ProcessALFile(ALFilePath: Text; ALFilname: Text)
+    local procedure ProcessALFile(ALFilePath: Text; ALFilename: Text)
     var
         ALFileInput: File;
         ALFileOutput: File;
@@ -438,17 +481,10 @@ codeunit 50250 "Transform AL Files"
         ALFileContentNew: Text;
         ALFileContentOld: Text;
         ALFileOutputPath: Text;
+        ALOutputFileName: Text;
         ALTextBuilder: TextBuilder;
 
     begin
-
-        // Define filepath for new file
-        ALFileOutputPath := ExportFolder + ALFilname + '.' + FileMgmt.GetExtension(ALFilePath);
-
-        // Create new file
-        ALFileOutput.WriteMode(true);
-        ALFileOutput.Create(ALFileOutputPath);
-        ALFileOutput.CreateOutStream(ALFileOutStream);
 
         // Open and read one AL File
         ALFileInput.Open(ALFilePath);
@@ -467,6 +503,16 @@ codeunit 50250 "Transform AL Files"
 
         end;
 
+        ALFileInput.Close();
+
+        // Define filepath for new file
+        GenerateOutputFileNameBasedOnCurrentFilename(ALFilename, ALOutputFileName);
+        ALFileOutputPath := ExportFolder + ALOutputFileName + '.al';
+
+        // Create new file
+        ALFileOutput.WriteMode(true);
+        ALFileOutput.Create(ALFileOutputPath);
+        ALFileOutput.CreateOutStream(ALFileOutStream);
 
         // Write the new content to the output
         ALFileOutStream.WriteText(ALTextBuilder.ToText());
