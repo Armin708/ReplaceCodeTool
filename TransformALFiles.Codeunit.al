@@ -76,21 +76,26 @@ codeunit 50250 "Transform AL Files"
         // "TableExtension 5" zu "tableextension 5"
         RegexPatterns.Add('\bTableExtension (\d+)\b', 'tableextension $1');
 
-        // "XmlPort 5" zu "xmlport 5"
-        RegexPatterns.Add('\bXmlPort (\d+)\b', 'xmlport $1');
+        // "Page 5" zu "page 5"
+        RegexPatterns.Add('\bPage (\d+)\b', 'page $1');
+
+        // "PageExtension 5" zu "pageextension 5"
+        RegexPatterns.Add('\bPageExtension (\d+)\b', 'pageextension $1');
 
         // "Report 5" zu "report 5"
         RegexPatterns.Add('\bReport (\d+)\b', 'report $1');
 
-        // "PageExtension 5" zu "pageextension 5"
-        RegexPatterns.Add('\bPageExtension (\d+)\b', 'pageextension $1');
+        // "Codeunit 5" zu "codeunit 5"
+        RegexPatterns.Add('\bCodeunit (\d+)\b', 'codeunit $1');
+
+        // "XmlPort 5" zu "xmlport 5"
+        RegexPatterns.Add('\bXmlPort (\d+)\b', 'xmlport $1');
 
         // "Query 5" zu "query 5"
         RegexPatterns.Add('\bQuery (\d+)\b', 'query $1');
 
         // "Query 5" zu "query 5"
-        RegexPatterns.Add('pageextension (\d+) pageextension\d+ extends ("[^"]+")', 'pageextension $1 $2 extends $2');
-
+        // RegexPatterns.Add('pageextension (\d+) pageextension\d+ extends ("[^"]+")', 'pageextension $1 $2 extends $2');
 
         // 'LookupPageID = ' to 'LookupPageId = '
         ReplacePatterns.Add('LookupPageID = ', 'LookupPageId = ');
