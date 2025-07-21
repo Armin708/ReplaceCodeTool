@@ -53,6 +53,11 @@ codeunit 50250 "Transform AL Files"
         FolderToProcess: Text;
         simpleUserID: Text;
 
+    procedure ProcessSpecialRules(var ALFileContentNew: Text)
+    begin
+        ProcessSpecialRulePageExtension(ALFileContentNew);
+    end;
+
     local procedure InitiliseDefaultValues()
     begin
 
@@ -93,9 +98,6 @@ codeunit 50250 "Transform AL Files"
 
         // "Query 5" zu "query 5"
         RegexPatterns.Add('\bQuery (\d+)\b', 'query $1');
-
-        // "Query 5" zu "query 5"
-        // RegexPatterns.Add('pageextension (\d+) pageextension\d+ extends ("[^"]+")', 'pageextension $1 $2 extends $2');
 
         // 'LookupPageID = ' to 'LookupPageId = '
         ReplacePatterns.Add('LookupPageID = ', 'LookupPageId = ');
@@ -458,6 +460,7 @@ codeunit 50250 "Transform AL Files"
             // TODO optimization: skip empty lines
             ProcessRegexRules(ALFileContentOld, ALFileContentNew);
             ProcessOtherRules(ALFileContentNew);
+            // ProcessSpecialRules(ALFileContentNew);
 
             ALTextBuilder.AppendLine(ALFileContentNew);
 
@@ -493,6 +496,37 @@ codeunit 50250 "Transform AL Files"
 
         ALFileContentNew := ALFileContentOld;
 
+    end;
+
+    local procedure ProcessSpecialRulePageExtension(var ALFileContentNew: Text)
+    var
+        MatchesTemp: Record Matches;
+        RegexFunctions: Codeunit Regex;
+        ReplacementValue: Text;
+        ValueToReplace: Text;
+
+    begin
+
+        // pageextension 50081 pageextension50081 extends "Bank Account List" zu pageextension 50081 "Bank Account List" extends "Bank Account List"
+        // test if we have a match
+        if not RegexFunctions.IsMatch(ALFileContentNew, 'pageextension (\d+) pageextension\d+ extends ("[^"]+")') then
+            exit;
+
+        // Get the value from the line that needs to be replaced
+        Clear(MatchesTemp);
+        MatchesTemp.DeleteAll(false);
+        RegexFunctions.Match(ALFileContentNew, 'pageextension\d+', MatchesTemp);
+        ValueToReplace := MatchesTemp.ReadValue();
+
+        // Get the value from the line that will replace it
+        Clear(MatchesTemp);
+        MatchesTemp.DeleteAll(false);
+        RegexFunctions.Match(ALFileContentNew, 'extends ("[^"]+")', MatchesTemp);
+        ReplacementValue := MatchesTemp.ReadValue();
+        ReplacementValue := ReplacementValue.Replace('extends', '');
+
+        // Do the magic
+        ALFileContentNew := ALFileContentNew.Replace(ValueToReplace, ReplacementValue);
 
     end;
 }

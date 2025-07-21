@@ -34,6 +34,26 @@ page 50255 "Transform AL Files"
                     ReplacCode.Run();
                 end;
             }
+
+            action(SpecialRulesTester)
+            {
+                ApplicationArea = All;
+                Caption = 'Special Rules testers';
+                Image = Start;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+
+                trigger OnAction()
+                var
+                    ReplacCode: Codeunit "Transform AL Files";
+                    filecontent: Text;
+                begin
+                    filecontent := 'pageextension 50081 pageextension50081 extends "Bank Account List"';
+                    ReplacCode.ProcessSpecialRules(filecontent);
+                end;
+            }
         }
     }
 
