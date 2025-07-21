@@ -556,7 +556,7 @@ codeunit 50250 "Transform AL Files"
         // pageextension 50081 pageextension50081 extends "Bank Account List" zu pageextension 50081 "Bank Account List" extends "Bank Account List"
 
         // test if we have a match
-        if not RegexFunctions.IsMatch(ALFileContentNew, 'pageextension (\d+) pageextension\d+ extends ("[^"]+")') then
+        if not RegexFunctions.IsMatch(ALFileContentNew, 'pageextension (\d+)\s+pageextension\1 extends ("[^"]+"|\w+)') then
             exit;
 
         // Get the value from the line that needs to be replaced
@@ -568,7 +568,7 @@ codeunit 50250 "Transform AL Files"
         // Get the value from the line that will replace it
         Clear(MatchesTemp);
         MatchesTemp.DeleteAll(false);
-        RegexFunctions.Match(ALFileContentNew, 'extends ("[^"]+")', MatchesTemp);
+        RegexFunctions.Match(ALFileContentNew, 'extends ("[^"]+"|\w+)', MatchesTemp);
         ReplacementValue := MatchesTemp.ReadValue();
         ReplacementValue := ReplacementValue.Replace('extends', '');
 
