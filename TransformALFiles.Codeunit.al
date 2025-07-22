@@ -50,14 +50,24 @@ codeunit 50250 "Transform AL Files"
         RegexPatternsObjectName: Dictionary of [Text, Text];
         ReplacePatterns: Dictionary of [Text, Text];
         Error001: Label 'No files Found!';
+
         ExportFolder: Text;
         FolderToProcess: Text;
+        RegexPatternExtensionObjectRules: array[2] of Text;
+
         simpleUserID: Text;
 
     procedure ProcessSpecialRules(var ALFileContentNew: Text)
+    var
+        ObjectExtensionTypes: Enum "Object Extension Types";
+        i: Integer;
+        ObjectExtensionTypesList: List of [Text];
+
     begin
-        // pageextension 50081 pageextension50081 extends "Bank Account List" zu pageextension 50081 "Bank Account List" extends "Bank Account List"
-        ProcessSpecialRulePageExtension(ALFileContentNew);
+
+        ObjectExtensionTypesList := ObjectExtensionTypes.Names();
+        for i := 0 to ObjectExtensionTypesList.Count() - 1 do
+            ProcessSpecialRuleExtensionObjects(ALFileContentNew, i);
     end;
 
     local procedure GenerateOutputFileNameBasedOnCurrentFilename(CurrentFilename: Text; var ALOutputFilename: Text)
@@ -142,6 +152,10 @@ codeunit 50250 "Transform AL Files"
         RegexPatternsObjectName.Add('(?i)\bxmlport\b', 'Xmlport');
         RegexPatternsObjectName.Add('(?i)\bquery\b', 'Query');
         RegexPatternsObjectName.Add('(?i)\breport\b', 'Report');
+
+        // Extension Object Rule
+        RegexPatternExtensionObjectRules[1] := '%1 (\d+)\s+%1\1 extends ("[^"]+"|\w+)';
+        RegexPatternExtensionObjectRules[2] := '%1\d+';
 
         // 'LookupPageID = ' to 'LookupPageId = '
         ReplacePatterns.Add('LookupPageID = ', 'LookupPageId = ');
@@ -496,7 +510,7 @@ codeunit 50250 "Transform AL Files"
 
             // TODO optimization: skip empty lines
             ProcessRegexRules(ALFileContentOld, ALFileContentNew);
-            ProcessOtherRules(ALFileContentNew);
+            ProcessReplaceRules(ALFileContentNew);
             ProcessSpecialRules(ALFileContentNew);
 
             ALTextBuilder.AppendLine(ALFileContentNew);
@@ -522,16 +536,6 @@ codeunit 50250 "Transform AL Files"
 
     end;
 
-    local procedure ProcessOtherRules(var ALFileContentNew: Text)
-    var
-        DictKey: Text;
-    begin
-
-        foreach DictKey in ReplacePatterns.Keys() do
-            ALFileContentNew := ALFileContentNew.Replace(DictKey, ReplacePatterns.Get(DictKey));
-
-    end;
-
     local procedure ProcessRegexRules(ALFileContentOld: Text; var ALFileContentNew: Text)
     var
         RegexFunctions: Codeunit Regex;
@@ -545,24 +549,73 @@ codeunit 50250 "Transform AL Files"
 
     end;
 
-    local procedure ProcessSpecialRulePageExtension(var ALFileContentNew: Text)
+    local procedure ProcessReplaceRules(var ALFileContentNew: Text)
+    var
+        DictKey: Text;
+    begin
+
+        foreach DictKey in ReplacePatterns.Keys() do
+            ALFileContentNew := ALFileContentNew.Replace(DictKey, ReplacePatterns.Get(DictKey));
+
+    end;
+
+    local procedure ProcessSpecialRuleExtensionObjects(var ALFileContentNew: Text; EnumID: Integer)
     var
         MatchesTemp: Record Matches;
         RegexFunctions: Codeunit Regex;
+        ObjectExtensionTypes: Enum "Object Extension Types";
+        RegexPatternObjectExtension1: Text;
+        RegexPatternObjectExtension2: Text;
         ReplacementValue: Text;
         ValueToReplace: Text;
 
+
     begin
-        // pageextension 50081 pageextension50081 extends "Bank Account List" zu pageextension 50081 "Bank Account List" extends "Bank Account List"
+
+        // Based on the Extensiontype, generate the correct Regex patterns
+        ObjectExtensionTypes := Enum::"Object Extension Types".FromInteger(EnumID);
+        case ObjectExtensionTypes of
+
+            ObjectExtensionTypes::TableExtension:
+                begin
+                    RegexPatternObjectExtension1 := RegexPatternExtensionObjectRules[1].Replace('%1', 'tableextension');
+                    RegexPatternObjectExtension2 := RegexPatternExtensionObjectRules[2].Replace('%1', 'tableextension');
+                end;
+            ObjectExtensionTypes::PageExtension:
+                begin
+                    RegexPatternObjectExtension1 := RegexPatternExtensionObjectRules[1].Replace('%1', 'pageextension');
+                    RegexPatternObjectExtension2 := RegexPatternExtensionObjectRules[2].Replace('%1', 'pageextension');
+                end;
+            ObjectExtensionTypes::ReportExtension:
+                begin
+                    RegexPatternObjectExtension1 := RegexPatternExtensionObjectRules[1].Replace('%1', 'reportextension');
+                    RegexPatternObjectExtension2 := RegexPatternExtensionObjectRules[2].Replace('%1', 'reportextension');
+                end;
+            ObjectExtensionTypes::PermissionSetExtension:
+                begin
+                    RegexPatternObjectExtension1 := RegexPatternExtensionObjectRules[1].Replace('%1', 'permissioneetextension');
+                    RegexPatternObjectExtension2 := RegexPatternExtensionObjectRules[2].Replace('%1', 'permissioneetextension');
+                end;
+            ObjectExtensionTypes::EnumExtension:
+                begin
+                    RegexPatternObjectExtension1 := RegexPatternExtensionObjectRules[1].Replace('%1', 'enumextension');
+                    RegexPatternObjectExtension2 := RegexPatternExtensionObjectRules[2].Replace('%1', 'enumextension');
+                end;
+            else
+                exit;
+
+        end;
+
+        // Example: pageextension 50081 pageextension50081 extends "Bank Account List" zu pageextension 50081 "Bank Account List" extends "Bank Account List"
 
         // test if we have a match
-        if not RegexFunctions.IsMatch(ALFileContentNew, 'pageextension (\d+)\s+pageextension\1 extends ("[^"]+"|\w+)') then
+        if not RegexFunctions.IsMatch(ALFileContentNew, RegexPatternObjectExtension1) then
             exit;
 
         // Get the value from the line that needs to be replaced
         Clear(MatchesTemp);
         MatchesTemp.DeleteAll(false);
-        RegexFunctions.Match(ALFileContentNew, 'pageextension\d+', MatchesTemp);
+        RegexFunctions.Match(ALFileContentNew, RegexPatternObjectExtension2, MatchesTemp);
         ValueToReplace := MatchesTemp.ReadValue();
 
         // Get the value from the line that will replace it
@@ -570,7 +623,7 @@ codeunit 50250 "Transform AL Files"
         MatchesTemp.DeleteAll(false);
         RegexFunctions.Match(ALFileContentNew, 'extends ("[^"]+"|\w+)', MatchesTemp);
         ReplacementValue := MatchesTemp.ReadValue();
-        ReplacementValue := ReplacementValue.Replace('extends', '');
+        ReplacementValue := ReplacementValue.Replace('extends ', '');
 
         // Do the magic
         ALFileContentNew := ALFileContentNew.Replace(ValueToReplace, ReplacementValue);
