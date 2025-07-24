@@ -569,7 +569,6 @@ codeunit 50250 "Transform AL Files"
         ReplacementValue: Text;
         ValueToReplace: Text;
 
-
     begin
 
         // Based on the Extensiontype, generate the correct Regex patterns
