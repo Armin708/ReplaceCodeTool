@@ -16,6 +16,7 @@ codeunit 50250 "Transform AL Files"
         // FilesTemp ID     -> PK
         // FilesTemp Name   -> Full Path
         // FilesTemp Value  -> File Name
+        // TEST
         Clear(FilesTemp);
         FileMgmt.GetServerDirectoryFilesList(FilesTemp, FolderToProcess);
         if FilesTemp.IsEmpty() then
@@ -483,6 +484,8 @@ codeunit 50250 "Transform AL Files"
         ReplacePatterns.Add('"whse. document type"::', '"Whse. Document Type"::');
         // '"wizard step"::' to '"Wizard Step"::'
         ReplacePatterns.Add('"wizard step"::', '"Wizard Step"::');
+        // Caption = ' '; to Caption = ' ', Locked = true;
+        ReplacePatterns.Add('Caption = '' '';', 'Caption = '' '', Locked = true');
 
     end;
 
